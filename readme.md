@@ -10,12 +10,12 @@ The usage is as follows
 
 **OPTIONS
 
--h|--help To display this help dialogue
+-h|--help               To display this help dialogue
 
--e|--encrypt <filename> To encrypt the file
+-e|--encrypt filename   To encrypt the file
 
--d|--decrypt <filename> To decrypt the file
+-d|--decrypt filename   To decrypt the file
 
--p|--password <password> To set the password
+-p|--password password  To set the password
 
 

@@ -6,9 +6,9 @@ This is a python3 program to encrypt and decrypt an input file using AES and a u
 
 The usage is as follows
 
-**$./aes-file-tool.py <options>
+**$./filecrypt.py <options>**
 
-**OPTIONS
+**OPTIONS**
 
 -h|--help               To display this help dialogue
 
@@ -18,4 +18,4 @@ The usage is as follows
 
 -p|--password password  To set the password
 
-
+-s|--security <low|high>To set the security level(AES128 or AES256)

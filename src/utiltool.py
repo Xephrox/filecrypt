@@ -5,47 +5,48 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
 
-def encrypt(key, filename):
-    outputfile = "[Encrypted]"+filename
-    blocksize = AES.block_size
-    IV = Random.new().read(blocksize)
-    encryptor = AES.new(key, AES.MODE_CBC, IV)
-    chunksize = 64*1024
-    filesize = str(os.path.getsize(filename)).zfill(blocksize)
-    with open(filename, 'rb') as infile:
-        with open(outputfile, 'wb') as outfile:
-            outfile.write(filesize.encode('utf-8'))
-            outfile.write(IV)
+class AES_Cipher:
+    def __init__(self, key, blocksize):
+        self._key = key
+        self._blocksize = blocksize
 
-            while True:
-                chunk = infile.read(chunksize)
-                if len(chunk) == 0:
-                    break
-                elif len(chunk)%blocksize != 0:
-                    chunk += b"\0" * (blocksize - len(chunk)%blocksize)
-                outfile.write(encryptor.encrypt(chunk))
+    def encrypt(self, infile, outfile, filesize):
+        blocksize = self._blocksize
+        IV = Random.new().read(blocksize)
+        key = self._key
+        encryptor = AES.new(key, AES.MODE_CBC, IV)
+        chunksize = blocksize*1024
+        outfile.write(filesize.encode('utf-8'))
+        outfile.write(IV)
 
-def decrypt(key, filename):
-    chunksize = 64*1024
-    outputfile = filename[11:]
-    blocksize = AES.block_size
-    with open(filename, 'rb') as infile:
+        while True:
+            chunk = infile.read(chunksize)
+            if len(chunk) == 0:
+                break
+            elif len(chunk)%blocksize != 0:
+                padding_length = (blocksize - len(chunk)%(blocksize))
+                chunk += padding_length * chr(padding_length).encode('utf-8')
+            outfile.write(encryptor.encrypt(chunk))
+
+    def decrypt(self, infile, outfile):
+        blocksize = self._blocksize
+        chunksize = blocksize*1024
         filesize = int(infile.read(blocksize))
         IV = infile.read(blocksize)
+        key = self._key
         decryptor = AES.new(key, AES.MODE_CBC, IV)
-
-        with open(outputfile, 'wb') as outfile:
-            while True:
-                chunk = infile.read(chunksize)
-                if(len(chunk) == 0):
-                    break
-
-                outfile.write(decryptor.decrypt(chunk))
-            outfile.truncate(filesize)
+        nextchunk = b''
+        while True:
+            chunk, nextchunk = nextchunk, decryptor.decrypt(infile.read(chunksize))
+            if (len(chunk) == 0):
+                continue
+            if(len(nextchunk) == 0):
+                padding_length = chunk[-1]
+                chunk = chunk[:-padding_length]
+                outfile.write(chunk)
+                break
+            outfile.write(chunk)
 
 def getKey(password):
     hasher = SHA256.new(password.encode('utf-8'))
     return hasher.digest()
-
-
-

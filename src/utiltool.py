@@ -47,6 +47,3 @@ class AES_Cipher:
                 break
             outfile.write(chunk)
 
-def getKey(password):
-    hasher = SHA256.new(password.encode('utf-8'))
-    return hasher.digest()

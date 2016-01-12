@@ -1,6 +1,7 @@
 ## AES File Tool
 
 This is a python3 program to encrypt and decrypt an input file using AES and a user set password.
+THIS IS STILL UNDER DEVELOPMENT
 
 ####Usage
 
